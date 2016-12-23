@@ -159,13 +159,9 @@
   };
 
   ns.PngExportController.prototype.onPixiDownloadClick_ = function () {
-    var zip = new window.JSZip();
-
     // Create PNG export.
     var canvas = this.createPngSpritesheet_();
     var name = this.piskelController.getPiskel().getDescriptor().name;
-
-    zip.file(name + '.png', pskl.utils.CanvasUtils.getBase64FromCanvas(canvas) + '\n', {base64: true});
 
     var width = canvas.width / this.getColumns_();
     var height = canvas.height / this.getRows_();
@@ -188,20 +184,18 @@
     var json = {
       'frames': frames,
       'meta': {
-        'app': 'http://www.pisker.com',
+        'app': 'https://github.com/juliandescottes/piskel/',
         'version': '1.0',
         'image': name + '.png',
         'format': 'RGBA8888',
         'size': {'w': canvas.width,'h': canvas.height}
       }
     };
-    zip.file(name + '.json', JSON.stringify(json));
 
-    var blob = zip.generate({
-      type : 'blob'
+    pskl.utils.BlobUtils.stringToBlob(JSON.stringify(json, null, 2), function(blob) {
+      pskl.utils.FileUtils.downloadAsFile(blob, name + '.json');
     });
 
-    pskl.utils.FileUtils.downloadAsFile(blob, name + '.zip');
   };
 
   ns.PngExportController.prototype.onDataUriClick_ = function (evt) {
